@@ -17,7 +17,7 @@ docker build -t shirasagi/michecker .
 run these commands:
 
 ~~~bash
-docker run -it --rm --name michecker -v "$PWD":/home -w /home shirasagi/michecker \
+docker run --rm --name michecker -v "$PWD":/home -w /home shirasagi/michecker \
   /opt/michecker/bin/michecker --no-interactive --no-sandbox --lang=ja-JP \
   --html-checker-output-report=hc-report.json \
   --lowvision-output-report=lv-report.json \
@@ -38,4 +38,38 @@ run these commands to upload the new container image to [docker hub](https://hub
 ~~~bash
 docker login
 docker push shirasagi/michecker
+~~~
+
+# SHIRASAGI との統合
+
+## docker container 内からシラサギの管理画面へアクセスできる場合
+
+### シラサギの設定
+
+1. SHIRASAGI をデプロイしたディレクトへ移動。
+2. config/michecker.yml （存在しない場合 config/defaults/michecker.yml を config/michecker.yml へコピー）をテキストエディタで開く。
+3. `disable: true` を `disable: false` へ変更。
+4. `command: [...]` を `command: [ "bin/docker-michecker.sh" ]` へ変更。
+5. config/michecker.yml を保存し SHIRASAGI を再起動。
+
+## docker container 内からシラサギの管理画面へアクセスできない場合
+
+シラサギを起動し、CMS のサイト情報の編集から「マイページドメイン」にIPアドレスを設定します。ここで設定する IP アドレスはホストがもつ IP アドレスの内 127.0.0.1 以外の IP アドレス（docker container 内からアクセスできる IP アドレスであれば何でも構いません）を設定します。
+そして、同じ画面の「マイページスキーム」が正しいかどうか確認し、保存します。
+これで利用できるようになると思います。
+
+## docker container 内からシラサギの管理画面へアクセスできるかどうかの見分け方
+
+次のコマンドを実行し、HTML が正しく表示されれば、docker container 内からシラサギの管理画面へアクセスできます。
+
+~~~
+docker run --rm -it shirasagi/michecker \
+  /opt/google/chrome/chrome --headless --no-sandbox --disable-gpu --dump-dom \
+  https://シラサギの管理画面のdomain/.mypage/login
+~~~
+
+次のように `<body></body>` が空の HTML が表示されれば、docker container 内からシラサギの管理画面へはアクセスできません。
+
+~~~
+<html><head></head><body></body></html>
 ~~~
