@@ -49,7 +49,7 @@ Then run these commands to upload the new container image to [GitHub Container R
 ~~~bash
 export CR_PAT=YOUR_TOKEN
 echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
-docker push ghcr.io/shirasagi/elasticsearch
+docker push ghcr.io/shirasagi/michecker
 ~~~
 
 YOUR_TOKEN is a personal access token created on the github your account page with "write:packages" scope, and USERNAME is your github account id.
